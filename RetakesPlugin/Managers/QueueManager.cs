@@ -1,3 +1,4 @@
+using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Utils;
 
@@ -46,6 +47,35 @@ public class QueueManager
     public int GetTargetNumCounterTerrorists()
     {
         return ActivePlayers.Count - GetTargetNumTerrorists();
+    }
+
+    public void PlayerAutoJoin(CCSPlayerController player)
+    {
+        if (ActivePlayers.Contains(player) || QueuePlayers.Contains(player))
+        {
+            return;
+        }
+
+        var gameRules = GameRulesHelper.GetGameRulesOrNull();
+        if ((gameRules?.WarmupPeriod ?? false) && ActivePlayers.Count < _maxRetakesPlayers)
+        {
+            Logger.LogInfo("QueueManager", $"[{player.PlayerName}] Auto-joined active players (warmup)");
+            ActivePlayers.Add(player);
+            player.ChangeTeam(CsTeam.CounterTerrorist);
+        }
+        else
+        {
+            Logger.LogInfo("QueueManager", $"[{player.PlayerName}] Auto-joined queue");
+            QueuePlayers.Add(player);
+            player.PrintToChat($"{_plugin.Localizer["retakes.prefix"]} {_plugin.Localizer["retakes.queue.joined"]}");
+        }
+
+        if (ActivePlayers.Count == 0)
+        {
+            ClearRoundTeams();
+            Update();
+            GameRulesHelper.RestartGame();
+        }
     }
 
     public HookResult PlayerJoinedTeam(CCSPlayerController player, CsTeam fromTeam, CsTeam toTeam)
@@ -116,8 +146,17 @@ public class QueueManager
             QueuePlayers.Add(player);
         }
 
+        // Let CS2 process the jointeam command so the team menu closes naturally,
+        // then move the player back to spectator on the next tick.
+        Server.NextFrame(() =>
+        {
+            if (PlayerHelper.IsValid(player) && !ActivePlayers.Contains(player))
+            {
+                player.ChangeTeam(CsTeam.Spectator);
+            }
+        });
         GameRulesHelper.CheckRoundDone();
-        return HookResult.Handled;
+        return HookResult.Continue;
     }
 
     private void RemoveDisconnectedPlayers()

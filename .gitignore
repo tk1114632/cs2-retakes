@@ -4,3 +4,6 @@
 /RetakesPluginShared/.idea
 *.DotSettings.user
 *.sln
+.vs/
+bin/
+obj/
