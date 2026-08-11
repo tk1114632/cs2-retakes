@@ -1,6 +1,8 @@
 using System.Text;
 using CounterStrikeSharp.API;
 
+using RetakesPlugin.Modules;
+
 namespace RetakesPlugin.Utils;
 
 public static class ServerHelper
@@ -27,7 +29,7 @@ public static class ServerHelper
 
             var retakesCfg = File.Create(RetakesCfgPath);
 
-            var retakesCfgContents = @"
+            var retakesCfgContents = $@"
                 // Things you shouldn't change:
                 bot_kick
                 bot_quota 0
@@ -52,15 +54,7 @@ public static class ServerHelper
                 mp_autokick 0
                 mp_c4timer 40
                 mp_freezetime 1
-                // Set mp_friendlyfire to 1 to enable utility friendly fire (HE, molotov, knife, zeus).
-                // The plugin blocks bullet damage between teammates, so guns stay harmless either way.
-                // The ff_damage_reduction_* values below are the Valve competitive defaults.
                 mp_friendlyfire 0
-                ff_damage_reduction_bullets 0.33
-                ff_damage_reduction_grenade 0.85
-                ff_damage_reduction_grenade_self 1
-                ff_damage_reduction_other 0.4
-                mp_tkpunish 0
                 mp_round_restart_delay 2
                 sv_talk_enemy_dead 0
                 sv_talk_enemy_living 0
@@ -74,6 +68,8 @@ public static class ServerHelper
                 mp_death_drop_defuser 1
                 mp_death_drop_grenade 1
                 mp_warmuptime 15
+
+{FriendlyFire.ConfigConVars}
 
                 echo [Retakes] Config loaded!
             ";

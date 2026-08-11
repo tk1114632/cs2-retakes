@@ -21,8 +21,6 @@ using RetakesPlugin.Commands.SpawnEditor;
 
 namespace RetakesPlugin;
 
-// 367 is required for Listeners.OnPlayerTakeDamagePre: the listeners landed in 352 and the
-// CBaseEntity_TakeDamageOld linux signature they rely on was only fixed in 367.
 [MinimumApiVersion(367)]
 public class RetakesPlugin : BasePlugin, IPluginConfig<BaseConfigs>
 {
@@ -110,8 +108,8 @@ public class RetakesPlugin : BasePlugin, IPluginConfig<BaseConfigs>
         Utils.Logger.LogInfo("Main", "Plugin loading...");
 
         RegisterListener<Listeners.OnMapStart>(OnMapStart);
-        RegisterListener<Listeners.OnPlayerTakeDamagePre>(OnPlayerTakeDamagePre);
         AddCommandListener("jointeam", OnCommandJoinTeam);
+        FriendlyFire.Register(this);
 
         var retakesPluginEventSender = new RetakesPluginEventSender();
         Capabilities.RegisterPluginCapability(RetakesPluginEventSenderCapability, () => retakesPluginEventSender);
@@ -330,30 +328,6 @@ public class RetakesPlugin : BasePlugin, IPluginConfig<BaseConfigs>
     private HookResult OnPlayerDeath(EventPlayerDeath @event, GameEventInfo info)
     {
         return _playerEventHandlers?.OnPlayerDeath(@event, info) ?? HookResult.Continue;
-    }
-
-    // Blocks bullet damage between teammates so that servers can run mp_friendlyfire 1 for
-    // utility (HE, molotov, knife, zeus) without teammates being able to shoot each other.
-    // Only DMG_BULLET is filtered - the knife is DMG_SLASH, the zeus is DMG_SHOCK, grenades
-    // are DMG_BLAST and fire is DMG_BURN, so those keep flowing through the game's own
-    // ff_damage_reduction_* scaling. No-op while mp_friendlyfire is 0.
-    private HookResult OnPlayerTakeDamagePre(CCSPlayerPawn playerPawn, CTakeDamageInfo info)
-    {
-        if ((info.BitsDamageType & DamageTypes_t.DMG_BULLET) == 0)
-        {
-            return HookResult.Continue;
-        }
-
-        var attacker = info.Attacker.Value;
-
-        if (attacker == null || attacker.Handle == playerPawn.Handle || attacker.TeamNum != playerPawn.TeamNum)
-        {
-            return HookResult.Continue;
-        }
-
-        // Handled skips the whole damage application, which also avoids the armour loss,
-        // the tagging and the "attacked a teammate" chat spam that a 0 damage value leaves behind.
-        return HookResult.Handled;
     }
 
     private HookResult OnBombPlanted(EventBombPlanted @event, GameEventInfo info)
