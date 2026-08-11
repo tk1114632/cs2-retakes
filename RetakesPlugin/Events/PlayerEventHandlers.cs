@@ -3,6 +3,7 @@ using CounterStrikeSharp.API.Modules.Admin;
 using CounterStrikeSharp.API.Modules.Utils;
 
 using RetakesPlugin.Managers;
+using RetakesPlugin.Modules;
 using RetakesPlugin.Utils;
 
 namespace RetakesPlugin.Events;
@@ -92,15 +93,16 @@ public class PlayerEventHandlers
 
     public HookResult OnPlayerDeath(EventPlayerDeath @event, GameEventInfo info)
     {
+        var victim = @event.Userid;
         var attacker = @event.Attacker;
         var assister = @event.Assister;
 
-        if (PlayerHelper.IsValid(attacker))
+        if (PlayerHelper.IsValid(attacker) && !FriendlyFire.IsTeamKill(attacker, victim))
         {
             _gameManager.AddKill(attacker);
         }
 
-        if (PlayerHelper.IsValid(assister))
+        if (PlayerHelper.IsValid(assister) && !FriendlyFire.IsTeamKill(assister, victim))
         {
             _gameManager.AddAssist(assister);
         }
