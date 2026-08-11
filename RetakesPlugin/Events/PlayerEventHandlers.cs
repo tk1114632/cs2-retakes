@@ -92,20 +92,28 @@ public class PlayerEventHandlers
 
     public HookResult OnPlayerDeath(EventPlayerDeath @event, GameEventInfo info)
     {
+        var victim = @event.Userid;
         var attacker = @event.Attacker;
         var assister = @event.Assister;
 
-        if (PlayerHelper.IsValid(attacker))
+        if (PlayerHelper.IsValid(attacker) && !IsTeamKill(attacker, victim))
         {
             _gameManager.AddKill(attacker);
         }
 
-        if (PlayerHelper.IsValid(assister))
+        if (PlayerHelper.IsValid(assister) && !IsTeamKill(assister, victim))
         {
             _gameManager.AddAssist(assister);
         }
 
         return HookResult.Continue;
+    }
+
+    // Utility can kill teammates when the server runs mp_friendlyfire 1, and those must not
+    // count towards the retakes scoreboard or the queue ranking.
+    private static bool IsTeamKill(CCSPlayerController attacker, CCSPlayerController? victim)
+    {
+        return PlayerHelper.IsValid(victim) && attacker.Handle != victim.Handle && attacker.Team == victim.Team;
     }
 
     public HookResult OnPlayerDisconnect(EventPlayerDisconnect @event, GameEventInfo info)
