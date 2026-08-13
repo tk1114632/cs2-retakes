@@ -1,8 +1,6 @@
 using System.Text;
 using CounterStrikeSharp.API;
 
-using RetakesPlugin.Modules;
-
 namespace RetakesPlugin.Utils;
 
 public static class ServerHelper
@@ -29,7 +27,7 @@ public static class ServerHelper
 
             var retakesCfg = File.Create(RetakesCfgPath);
 
-            var retakesCfgContents = $@"
+            var retakesCfgContents = @"
                 // Things you shouldn't change:
                 bot_kick
                 bot_quota 0
@@ -68,8 +66,6 @@ public static class ServerHelper
                 mp_death_drop_defuser 1
                 mp_death_drop_grenade 1
                 mp_warmuptime 15
-
-{FriendlyFire.ConfigConVars}
 
                 echo [Retakes] Config loaded!
             ";

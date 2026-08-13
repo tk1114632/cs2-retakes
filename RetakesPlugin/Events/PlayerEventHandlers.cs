@@ -3,7 +3,6 @@ using CounterStrikeSharp.API.Modules.Admin;
 using CounterStrikeSharp.API.Modules.Utils;
 
 using RetakesPlugin.Managers;
-using RetakesPlugin.Modules;
 using RetakesPlugin.Utils;
 
 namespace RetakesPlugin.Events;
@@ -97,17 +96,25 @@ public class PlayerEventHandlers
         var attacker = @event.Attacker;
         var assister = @event.Assister;
 
-        if (PlayerHelper.IsValid(attacker) && !FriendlyFire.IsTeamKill(attacker, victim))
+        if (PlayerHelper.IsValid(attacker) && !IsTeamKill(attacker, victim))
         {
             _gameManager.AddKill(attacker);
         }
 
-        if (PlayerHelper.IsValid(assister) && !FriendlyFire.IsTeamKill(assister, victim))
+        if (PlayerHelper.IsValid(assister) && !IsTeamKill(assister, victim))
         {
             _gameManager.AddAssist(assister);
         }
 
         return HookResult.Continue;
+    }
+
+    // A server running mp_friendlyfire 1 for utility lets players kill teammates with an HE or a
+    // molotov, and those must not count towards the retakes scoreboard or the queue ranking.
+    // Self inflicted deaths are not team kills, so they keep their existing behaviour.
+    private static bool IsTeamKill(CCSPlayerController attacker, CCSPlayerController? victim)
+    {
+        return PlayerHelper.IsValid(victim) && attacker.Handle != victim.Handle && attacker.Team == victim.Team;
     }
 
     public HookResult OnPlayerDisconnect(EventPlayerDisconnect @event, GameEventInfo info)
