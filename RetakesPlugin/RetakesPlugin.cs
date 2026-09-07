@@ -129,7 +129,7 @@ public class RetakesPlugin : BasePlugin, IPluginConfig<BaseConfigs>
 
         if (hotReload)
         {
-            Utils.Logger.LogServer($"Update detected, restarting map...");
+            this.PrintLocalizedChatAll("retakes.update.restarting");
             Server.ExecuteCommand($"map {Server.MapName}");
         }
 

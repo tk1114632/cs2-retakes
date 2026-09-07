@@ -39,14 +39,12 @@ public class AnnouncementService
         var numTerrorist = PlayerHelper.GetPlayerCount(CounterStrikeSharp.API.Modules.Utils.CsTeam.Terrorist);
         var numCounterTerrorist = PlayerHelper.GetPlayerCount(CounterStrikeSharp.API.Modules.Utils.CsTeam.CounterTerrorist);
 
-        var announcementMessage = _plugin.Localizer["retakes.bombsite.announcement", bombsite.ToString(), numTerrorist, numCounterTerrorist];
-        var centerAnnouncementMessage = _plugin.Localizer["retakes.center.bombsite.announcement", bombsite.ToString(), numTerrorist, numCounterTerrorist];
 
         foreach (var player in Utilities.GetPlayers())
         {
             if (!onlyCenter)
             {
-                player.PrintToChat($"{_plugin.Localizer["retakes.prefix"]} {announcementMessage}");
+                _plugin.PrintLocalizedChat(player, "retakes.bombsite.announcement", bombsite.ToString(), numTerrorist, numCounterTerrorist);
 
                 if (_voicesEnabled && !_hasMutedVoices.Contains(player))
                 {
@@ -64,7 +62,7 @@ public class AnnouncementService
 
             if (player.Team == CounterStrikeSharp.API.Modules.Utils.CsTeam.CounterTerrorist)
             {
-                player.PrintToCenter(centerAnnouncementMessage);
+                player.PrintToCenter(_plugin.Translate(player, "retakes.center.bombsite.announcement", bombsite.ToString(), numTerrorist, numCounterTerrorist));
             }
         }
 

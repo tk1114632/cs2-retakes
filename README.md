@@ -38,6 +38,9 @@ If you appreciate the project then please take the time to star the repository ð
 4. Start the server and wait for the config.json file to be generated in `addons/counterstrikesharp/configs/plugins/RetakesPlugin`.
 5. Complete the configuration file with the parameters of your choice.
 
+## Player language
+Players can use CounterStrikeSharp's `!lang en` or `!lang zh-Hans` to select their language for messages and announcements. Deploy the updated `lang/` files with the plugin. Newly added messages use English placeholders in languages that have not yet been translated, so they do not fall back to an unrelated server language or display translation keys.
+
 ## Recommendations
 I also recommend installing these plugins for an improved player experience
 - Instadefuse: https://github.com/B3none/cs2-instadefuse

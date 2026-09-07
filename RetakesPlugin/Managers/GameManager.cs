@@ -38,8 +38,11 @@ public class GameManager
     public void ScrambleNextRound(CCSPlayerController? admin = null)
     {
         _scrambleNextRound = true;
-        var message = $"{_plugin.Localizer["retakes.prefix"]} {_plugin.Localizer["retakes.teams.admin_scramble", admin?.PlayerName ?? "The server owner"]}";
-        Server.PrintToChatAll(message);
+        foreach (var player in Utilities.GetPlayers().Where(PlayerHelper.IsValid))
+        {
+            _plugin.PrintLocalizedChat(player, "retakes.teams.admin_scramble",
+                admin?.PlayerName ?? _plugin.Translate(player, "retakes.server_owner"));
+        }
         Logger.LogInfo("GameManager", $"Teams will be scrambled next round by {admin?.PlayerName ?? "server"}");
     }
 
@@ -148,20 +151,17 @@ public class GameManager
 
         if (shouldScrambleNow)
         {
-            var message = $"{_plugin.Localizer["retakes.prefix"]} {_plugin.Localizer["retakes.teams.scramble", _consecutiveRoundWinsToScramble]}";
-            Server.PrintToChatAll(message);
+            _plugin.PrintLocalizedChatAll("retakes.teams.scramble", _consecutiveRoundWinsToScramble);
             Logger.LogInfo("GameManager", $"Scrambling teams after {_consecutiveRoundWinsToScramble} T wins");
             ScrambleTeams();
         }
         else if (shouldAlmostScramble)
         {
-            var message = $"{_plugin.Localizer["retakes.prefix"]} {_plugin.Localizer["retakes.teams.almost_scramble", _consecutiveRoundsWon, roundsLeftToScramble]}";
-            Server.PrintToChatAll(message);
+            _plugin.PrintLocalizedChatAll("retakes.teams.almost_scramble", _consecutiveRoundsWon, roundsLeftToScramble);
         }
         else if (_consecutiveRoundsWon >= 3)
         {
-            var message = $"{_plugin.Localizer["retakes.prefix"]} {_plugin.Localizer["retakes.teams.win_streak", _consecutiveRoundsWon]}";
-            Server.PrintToChatAll(message);
+            _plugin.PrintLocalizedChatAll("retakes.teams.win_streak", _consecutiveRoundsWon);
         }
     }
 
@@ -169,8 +169,7 @@ public class GameManager
     {
         if (_consecutiveRoundsWon >= 3)
         {
-            var message = $"{_plugin.Localizer["retakes.prefix"]} {_plugin.Localizer["retakes.teams.win_streak_over", _consecutiveRoundsWon]}";
-            Server.PrintToChatAll(message);
+            _plugin.PrintLocalizedChatAll("retakes.teams.win_streak_over", _consecutiveRoundsWon);
             Logger.LogInfo("GameManager", $"CT broke {_consecutiveRoundsWon} round win streak");
         }
 

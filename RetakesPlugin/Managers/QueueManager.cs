@@ -67,7 +67,7 @@ public class QueueManager
         {
             Logger.LogInfo("QueueManager", $"[{player.PlayerName}] Auto-joined queue");
             QueuePlayers.Add(player);
-            player.PrintToChat($"{_plugin.Localizer["retakes.prefix"]} {_plugin.Localizer["retakes.queue.joined"]}");
+            player.PrintToChat($"{_plugin.Translate(player, "retakes.prefix")} {_plugin.Translate(player, "retakes.queue.joined")}");
         }
 
         if (ActivePlayers.Count == 0)
@@ -142,7 +142,7 @@ public class QueueManager
             }
 
             Logger.LogInfo("QueueManager", $"[{player.PlayerName}] Added to queue");
-            player.PrintToChat($"{_plugin.Localizer["retakes.prefix"]} {_plugin.Localizer["retakes.queue.joined"]}");
+            player.PrintToChat($"{_plugin.Translate(player, "retakes.prefix")} {_plugin.Translate(player, "retakes.queue.joined")}");
             QueuePlayers.Add(player);
         }
 
@@ -245,12 +245,12 @@ public class QueueManager
             replaceablePlayer.ChangeTeam(CsTeam.Spectator);
             ActivePlayers.Remove(replaceablePlayer);
             QueuePlayers.Add(replaceablePlayer);
-            replaceablePlayer.PrintToChat($"{_plugin.Localizer["retakes.prefix"]} {_plugin.Localizer["retakes.queue.replaced_by_vip", queuePlayer.PlayerName, queuePlayerDisplayName]}");
+            replaceablePlayer.PrintToChat($"{_plugin.Translate(replaceablePlayer, "retakes.prefix")} {_plugin.Translate(replaceablePlayer, "retakes.queue.replaced_by_vip", queuePlayer.PlayerName, queuePlayerDisplayName)}");
 
             ActivePlayers.Add(queuePlayer);
             QueuePlayers.Remove(queuePlayer);
             queuePlayer.ChangeTeam(CsTeam.CounterTerrorist);
-            queuePlayer.PrintToChat($"{_plugin.Localizer["retakes.prefix"]} {_plugin.Localizer["retakes.queue.vip_took_place", replaceablePlayer.PlayerName, queuePlayerDisplayName]}");
+            queuePlayer.PrintToChat($"{_plugin.Translate(queuePlayer, "retakes.prefix")} {_plugin.Translate(queuePlayer, "retakes.queue.vip_took_place", replaceablePlayer.PlayerName, queuePlayerDisplayName)}");
 
             Logger.LogInfo("QueueManager", $"{queuePlayer.PlayerName} ({queuePlayerDisplayName}, priority: {queuePlayerPriority}) replaced {replaceablePlayer.PlayerName} (priority: {replaceablePlayerData.Priority})");
         }
@@ -297,7 +297,6 @@ public class QueueManager
 
         if (ActivePlayers.Count == _maxRetakesPlayers && QueuePlayers.Count > 0)
         {
-            var waitingMessage = _plugin.Localizer["retakes.queue.waiting", ActivePlayers.Count];
             foreach (var player in QueuePlayers)
             {
                 if (!PlayerHelper.IsValid(player))
@@ -305,7 +304,7 @@ public class QueueManager
                     continue;
                 }
 
-                player.PrintToChat($"{_plugin.Localizer["retakes.prefix"]} {waitingMessage}");
+                player.PrintToChat($"{_plugin.Translate(player, "retakes.prefix")} {_plugin.Translate(player, "retakes.queue.waiting", ActivePlayers.Count)}");
             }
         }
     }
