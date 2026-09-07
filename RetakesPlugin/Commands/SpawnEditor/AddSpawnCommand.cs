@@ -33,45 +33,45 @@ public class AddSpawnCommand
         var requiredPermission = PlayerHelper.GetCommandPermission(_plugin.Config, commandName, "SpawnEditor");
         if (!AdminManager.PlayerHasPermissions(player, requiredPermission))
         {
-            commandInfo.ReplyToCommand($"{_plugin.Localizer["retakes.prefix"]} {_plugin.Localizer["retakes.no_permissions"]}");
+            commandInfo.ReplyToCommand($"{_plugin.Translate(player, "retakes.prefix")} {_plugin.Translate(player, "retakes.no_permissions")}");
             return;
         }
 
         if (_showSpawnsCommand.ShowingSpawnsForBombsite == null)
         {
-            commandInfo.ReplyToCommand($"{_plugin.Localizer["retakes.prefix"]} You can't add a spawn if you're not showing the spawns.");
+            commandInfo.ReplyToCommand($"{_plugin.Translate(player, "retakes.prefix")} {_plugin.Translate(player, "retakes.spawn.show_before_add")}");
             return;
         }
 
         if (!PlayerHelper.HasAlivePawn(player))
         {
-            commandInfo.ReplyToCommand($"{_plugin.Localizer["retakes.prefix"]} You must have an alive player pawn.");
+            commandInfo.ReplyToCommand($"{_plugin.Translate(player, "retakes.prefix")} {_plugin.Translate(player, "retakes.spawn.alive_required")}");
             return;
         }
 
         if (commandInfo.ArgCount < 2)
         {
-            commandInfo.ReplyToCommand($"{_plugin.Localizer["retakes.prefix"]} Usage: !add [T/CT] [Y/N can be planter]");
+            commandInfo.ReplyToCommand($"{_plugin.Translate(player, "retakes.prefix")} {_plugin.Translate(player, "retakes.command.usage", "!add [T/CT] [Y/N can be planter]")}");
             return;
         }
 
         var team = commandInfo.GetArg(1).ToUpper();
         if (team != "T" && team != "CT")
         {
-            commandInfo.ReplyToCommand($"{_plugin.Localizer["retakes.prefix"]} You must specify a team [T / CT].");
+            commandInfo.ReplyToCommand($"{_plugin.Translate(player, "retakes.prefix")} {_plugin.Translate(player, "retakes.command.team_required")}");
             return;
         }
 
         var canBePlanterInput = commandInfo.GetArg(2).ToUpper();
         if (!string.IsNullOrWhiteSpace(canBePlanterInput) && canBePlanterInput != "Y" && canBePlanterInput != "N")
         {
-            commandInfo.ReplyToCommand($"{_plugin.Localizer["retakes.prefix"]} Incorrect value for can be planter [Y / N].");
+            commandInfo.ReplyToCommand($"{_plugin.Translate(player, "retakes.prefix")} {_plugin.Translate(player, "retakes.spawn.planter_invalid")}");
             return;
         }
 
         if (_plugin.SpawnManager == null || _plugin.MapConfigService == null)
         {
-            commandInfo.ReplyToCommand($"{_plugin.Localizer["retakes.prefix"]} Services not initialized.");
+            commandInfo.ReplyToCommand($"{_plugin.Translate(player, "retakes.prefix")} {_plugin.Translate(player, "retakes.command.not_initialized")}");
             return;
         }
 
@@ -92,7 +92,7 @@ public class AddSpawnCommand
 
         if (closestDistance <= 72)
         {
-            commandInfo.ReplyToCommand($"{_plugin.Localizer["retakes.prefix"]} You are too close to another spawn.");
+            commandInfo.ReplyToCommand($"{_plugin.Translate(player, "retakes.prefix")} {_plugin.Translate(player, "retakes.spawn.too_close")}");
             return;
         }
 
@@ -114,7 +114,7 @@ public class AddSpawnCommand
             _plugin.SpawnManager.CalculateMapSpawns();
         }
 
-        commandInfo.ReplyToCommand($"{_plugin.Localizer["retakes.prefix"]} {(didAddSpawn ? "Spawn added" : "Error adding spawn")}");
+        commandInfo.ReplyToCommand($"{_plugin.Translate(player, "retakes.prefix")} {_plugin.Translate(player, didAddSpawn ? "retakes.spawn.added" : "retakes.spawn.add_failed")}");
 
         if (didAddSpawn)
         {

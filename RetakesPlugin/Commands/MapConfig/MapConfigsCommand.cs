@@ -28,7 +28,7 @@ public class MapConfigsCommand
         var requiredPermission = PlayerHelper.GetCommandPermission(_plugin.Config, commandName, "MapConfig");
         if (!AdminManager.PlayerHasPermissions(player, requiredPermission))
         {
-            commandInfo.ReplyToCommand($"{_plugin.Localizer["retakes.prefix"]} {_plugin.Localizer["retakes.no_permissions"]}");
+            commandInfo.ReplyToCommand($"{_plugin.Translate(player, "retakes.prefix")} {_plugin.Translate(player, "retakes.no_permissions")}");
             return;
         }
 
@@ -36,7 +36,7 @@ public class MapConfigsCommand
 
         if (!Directory.Exists(mapConfigDirectory))
         {
-            commandInfo.ReplyToCommand($"{_plugin.Localizer["retakes.prefix"]} No map configs found.");
+            commandInfo.ReplyToCommand($"{_plugin.Translate(player, "retakes.prefix")} {_plugin.Translate(player, "retakes.mapconfig.none")}");
             return;
         }
 
@@ -45,7 +45,7 @@ public class MapConfigsCommand
 
         if (files.Length == 0)
         {
-            commandInfo.ReplyToCommand($"{_plugin.Localizer["retakes.prefix"]} No map configs found.");
+            commandInfo.ReplyToCommand($"{_plugin.Translate(player, "retakes.prefix")} {_plugin.Translate(player, "retakes.mapconfig.none")}");
             return;
         }
 
@@ -55,10 +55,10 @@ public class MapConfigsCommand
                 .Replace($"{mapConfigDirectory}/", "")
                 .Replace(".json", "");
 
-            commandInfo.ReplyToCommand($"{_plugin.Localizer["retakes.prefix"]} !mapconfig {transformedFile}");
-            player?.PrintToConsole($"{_plugin.Localizer["retakes.prefix"]} !mapconfig {transformedFile}");
+            commandInfo.ReplyToCommand($"{_plugin.Translate(player, "retakes.prefix")} !mapconfig {transformedFile}");
+            player?.PrintToConsole($"{_plugin.Translate(player, "retakes.prefix")} !mapconfig {transformedFile}");
         }
 
-        commandInfo.ReplyToCommand($"{_plugin.Localizer["retakes.prefix"]} A list of available map configs has been outputted above.");
+        commandInfo.ReplyToCommand($"{_plugin.Translate(player, "retakes.prefix")} {_plugin.Translate(player, "retakes.mapconfig.listed")}");
     }
 }
