@@ -6,8 +6,12 @@ namespace RetakesPlugin.Utils;
 
 public static class LocalizationExtensions
 {
+    // GOTV proxies, bots and connections that are not authorized yet have a SteamID of 0, which
+    // ForPlayer cannot convert. Those get the server language instead of throwing.
     public static string Translate(this RetakesPlugin plugin, CCSPlayerController? player,
-        string key, params object[] args) => plugin.Localizer.ForPlayer(player, key, args);
+        string key, params object[] args) => player is { IsValid: true, SteamID: not 0 }
+        ? plugin.Localizer.ForPlayer(player, key, args)
+        : plugin.Localizer[key, args].Value;
 
     public static void PrintLocalizedChat(this RetakesPlugin plugin, CCSPlayerController player,
         string key, params object[] args)
