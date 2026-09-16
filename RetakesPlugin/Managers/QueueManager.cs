@@ -61,7 +61,7 @@ public class QueueManager
         {
             Logger.LogInfo("QueueManager", $"[{player.PlayerName}] Auto-joined active players (warmup)");
             ActivePlayers.Add(player);
-            player.ChangeTeam(CsTeam.CounterTerrorist);
+            ChangeActivePlayerTeam(player, CsTeam.CounterTerrorist);
         }
         else
         {
@@ -76,6 +76,33 @@ public class QueueManager
             Update();
             GameRulesHelper.RestartGame();
         }
+    }
+
+    private void ChangeActivePlayerTeam(CCSPlayerController player, CsTeam team)
+    {
+        player.ChangeTeam(team);
+
+        // ChangeTeam can leave the player dead, and retakes disables automatic respawns.
+        // Defer until the team change has completed and recheck eligibility at execution time.
+        if (team is not (CsTeam.Terrorist or CsTeam.CounterTerrorist)
+            || !(GameRulesHelper.GetGameRulesOrNull()?.WarmupPeriod ?? false))
+        {
+            return;
+        }
+
+        Server.NextFrame(() =>
+        {
+            if (!PlayerHelper.IsValid(player) || !PlayerHelper.IsConnected(player)
+                || !ActivePlayers.Contains(player)
+                || player.Team is not (CsTeam.Terrorist or CsTeam.CounterTerrorist)
+                || player.PawnIsAlive
+                || !(GameRulesHelper.GetGameRulesOrNull()?.WarmupPeriod ?? false))
+            {
+                return;
+            }
+
+            player.Respawn();
+        });
     }
 
     public HookResult PlayerJoinedTeam(CCSPlayerController player, CsTeam fromTeam, CsTeam toTeam)
@@ -249,7 +276,7 @@ public class QueueManager
 
             ActivePlayers.Add(queuePlayer);
             QueuePlayers.Remove(queuePlayer);
-            queuePlayer.ChangeTeam(CsTeam.CounterTerrorist);
+            ChangeActivePlayerTeam(queuePlayer, CsTeam.CounterTerrorist);
             queuePlayer.PrintToChat($"{_plugin.Translate(queuePlayer, "retakes.prefix")} {_plugin.Translate(queuePlayer, "retakes.queue.vip_took_place", replaceablePlayer.PlayerName, queuePlayerDisplayName)}");
 
             Logger.LogInfo("QueueManager", $"{queuePlayer.PlayerName} ({queuePlayerDisplayName}, priority: {queuePlayerPriority}) replaced {replaceablePlayer.PlayerName} (priority: {replaceablePlayerData.Priority})");
@@ -288,7 +315,7 @@ public class QueueManager
                 }
 
                 ActivePlayers.Add(player);
-                player.ChangeTeam(CsTeam.CounterTerrorist);
+                ChangeActivePlayerTeam(player, CsTeam.CounterTerrorist);
                 Logger.LogInfo("QueueManager", $"Moved {player.PlayerName} from queue to active");
             }
         }

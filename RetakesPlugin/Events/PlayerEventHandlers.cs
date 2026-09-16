@@ -34,7 +34,7 @@ public class PlayerEventHandlers
         // Add small delay to ensure player is fully connected
         _plugin.AddTimer(1.0f, () =>
         {
-            if (!PlayerHelper.IsValid(player))
+            if (!PlayerHelper.IsValid(player) || !PlayerHelper.IsConnected(player))
             {
                 return;
             }
